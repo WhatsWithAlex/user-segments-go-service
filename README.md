@@ -1,0 +1,1 @@
+# User segments management service in Go
