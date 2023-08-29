@@ -1,0 +1,16 @@
+version: "2"
+sql:
+- schema: "/migrations"
+  queries: "/queries"
+  engine: "postgresql"
+  gen:
+    go:
+      package: "db"
+      out: "../internal/db"
+      sql_package: "pgx/v5"
+      emit_json_tags: true
+      emit_empty_slices: true
+  database:
+    uri: "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_ADDR}:${DB_PORT}/${DB_NAME}?sslmode=disable"
+  rules:
+    - sqlc/db-prepare
