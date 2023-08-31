@@ -61,5 +61,5 @@ func (usc *userSegmentController) updateUserSegments(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.SuccessResponse("user's segments updates successfully"))
+	c.JSON(http.StatusOK, domain.SuccessResponse("user's segments updated successfully"))
 }
