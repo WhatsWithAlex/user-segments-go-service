@@ -22,10 +22,10 @@ type GetUserSegmentsResponse struct {
 }
 
 type UpdateUserSegmentsRequest struct {
-	UserID         int       `json:"user_id"             binding:"required,gte=0"`
-	AddSegments    []string  `json:"add_segments"        binding:"required_without=RemoveSegments"`
-	RemoveSegments []string  `json:"remove_segments"     binding:"required_without=AddSegments"`
-	RemoveAt       *time.Time `json:"remove_at,omitempty" binding:"omitempty"`
+	UserID         int        `json:"user_id"             binding:"required,gte=0"`
+	AddSegments    []string   `json:"add_segments"        binding:"required_without=RemoveSegments"`
+	RemoveSegments []string   `json:"remove_segments"     binding:"required_without=AddSegments"`
+	RemoveAt       *time.Time `json:"remove_at,omitempty" binding:"omitempty,gte"`
 }
 
 type UserSegmentService interface {

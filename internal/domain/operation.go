@@ -20,9 +20,9 @@ type Operation struct {
 }
 
 type GetOperationsRequest struct {
-	UserID   int        `form:"user_id"           binding:"required"`
-	Month    int        `form:"month"             binding:"required"`
-	Year     int        `form:"year"              binding:"required"`
+	UserID int `form:"user_id" binding:"required"`
+	Month  int `form:"month"   binding:"required,gte=1,lte=12"`
+	Year   int `form:"year"    binding:"required,gte=1970,lte=9999"`
 }
 
 type GetOperationsResponse struct {
