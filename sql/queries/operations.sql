@@ -1,5 +1,11 @@
 -- name: CreateOperation :exec
 INSERT INTO
+    operations (user_id, segment_slug, op_type)
+VALUES
+    ($2, $3, $1);
+
+-- name: CreateOperationWithTS :exec
+INSERT INTO
     operations (user_id, segment_slug, op_type, done_at)
 VALUES
     ($2, $3, $1, $4);

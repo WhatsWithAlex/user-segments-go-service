@@ -13,20 +13,38 @@ import (
 
 const createOperation = `-- name: CreateOperation :exec
 INSERT INTO
+    operations (user_id, segment_slug, op_type)
+VALUES
+    ($2, $3, $1)
+`
+
+type CreateOperationParams struct {
+	OpType      Op     `json:"op_type"`
+	UserID      int32  `json:"user_id"`
+	SegmentSlug string `json:"segment_slug"`
+}
+
+func (q *Queries) CreateOperation(ctx context.Context, arg CreateOperationParams) error {
+	_, err := q.db.Exec(ctx, createOperation, arg.OpType, arg.UserID, arg.SegmentSlug)
+	return err
+}
+
+const createOperationWithTS = `-- name: CreateOperationWithTS :exec
+INSERT INTO
     operations (user_id, segment_slug, op_type, done_at)
 VALUES
     ($2, $3, $1, $4)
 `
 
-type CreateOperationParams struct {
+type CreateOperationWithTSParams struct {
 	OpType      Op                 `json:"op_type"`
 	UserID      int32              `json:"user_id"`
 	SegmentSlug string             `json:"segment_slug"`
 	DoneAt      pgtype.Timestamptz `json:"done_at"`
 }
 
-func (q *Queries) CreateOperation(ctx context.Context, arg CreateOperationParams) error {
-	_, err := q.db.Exec(ctx, createOperation,
+func (q *Queries) CreateOperationWithTS(ctx context.Context, arg CreateOperationWithTSParams) error {
+	_, err := q.db.Exec(ctx, createOperationWithTS,
 		arg.OpType,
 		arg.UserID,
 		arg.SegmentSlug,
