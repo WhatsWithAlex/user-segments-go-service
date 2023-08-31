@@ -15,7 +15,7 @@ const addUserSegment = `-- name: AddUserSegment :exec
 INSERT INTO
     user_segments (user_id, segment_id, remove_at)
 VALUES
-    ($1, $2, $3)
+    ($1, $2, $3) ON CONFLICT(user_id, segment_id) DO NOTHING
 `
 
 type AddUserSegmentParams struct {
@@ -39,7 +39,7 @@ SELECT
 FROM
     segments
 WHERE
-    slug = $2
+    slug = $2 ON CONFLICT(user_id, segment_id) DO NOTHING
 `
 
 type AddUserSegmentBySlugParams struct {
@@ -319,6 +319,42 @@ WHERE
 
 func (q *Queries) GetUsersBySegmentID(ctx context.Context, segmentID int32) ([]int32, error) {
 	rows, err := q.db.Query(ctx, getUsersBySegmentID, segmentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []int32{}
+	for rows.Next() {
+		var user_id int32
+		if err := rows.Scan(&user_id); err != nil {
+			return nil, err
+		}
+		items = append(items, user_id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUsersBySegmentSlug = `-- name: GetUsersBySegmentSlug :many
+SELECT
+    user_id
+FROM
+    user_segments
+WHERE
+    segment_id IN (
+        SELECT
+            id
+        FROM
+            segments
+        WHERE
+            slug = $1
+    )
+`
+
+func (q *Queries) GetUsersBySegmentSlug(ctx context.Context, slug string) ([]int32, error) {
+	rows, err := q.db.Query(ctx, getUsersBySegmentSlug, slug)
 	if err != nil {
 		return nil, err
 	}

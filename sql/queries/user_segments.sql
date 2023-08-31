@@ -2,7 +2,7 @@
 INSERT INTO
     user_segments (user_id, segment_id, remove_at)
 VALUES
-    ($1, $2, $3);
+    ($1, $2, $3) ON CONFLICT(user_id, segment_id) DO NOTHING;
 
 -- name: AddUserSegmentBySlug :exec
 INSERT INTO
@@ -14,7 +14,7 @@ SELECT
 FROM
     segments
 WHERE
-    slug = $2;
+    slug = $2 ON CONFLICT(user_id, segment_id) DO NOTHING;
 
 -- name: GetUserSegments :many
 SELECT
@@ -59,6 +59,21 @@ FROM
     user_segments
 WHERE
     segment_id = $1;
+
+-- name: GetUsersBySegmentSlug :many
+SELECT
+    user_id
+FROM
+    user_segments
+WHERE
+    segment_id IN (
+        SELECT
+            id
+        FROM
+            segments
+        WHERE
+            slug = $1
+    );
 
 -- name: GetUsers :many
 SELECT
