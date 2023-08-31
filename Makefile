@@ -1,7 +1,8 @@
 -include .env
 
 postgres:
-	docker run --name postgres15-server -p $(DB_PORT):5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) -d postgres:15-alpine
+	docker run --name postgres15-server -p $(DB_PORT):5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) -d postgres:15-alpine \
+	|| docker start postgres15-server
 
 createdb:
 	docker exec -it postgres15-server createdb --username=$(DB_USER) --owner=$(DB_USER) $(DB_NAME)
