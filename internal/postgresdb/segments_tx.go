@@ -65,12 +65,12 @@ func (store *Store) DeleteSegmentTX(ctx context.Context, segmentSlug string) err
 	err := store.execTx(ctx, func(q *Queries) error {
 		var txerr error
 
-		segmentID, txerr := q.DeleteSegmentBySlug(ctx, segmentSlug)
+		userIDs, txerr := q.GetUsersBySegmentSlug(ctx, segmentSlug)
 		if txerr != nil {
 			return txerr
 		}
 
-		userIDs, txerr := q.GetUsersBySegmentID(ctx, segmentID)
+		_, txerr = q.DeleteSegmentBySlug(ctx, segmentSlug)
 		if txerr != nil {
 			return txerr
 		}

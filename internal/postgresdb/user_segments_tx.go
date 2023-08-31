@@ -23,26 +23,6 @@ func (store *Store) UpdateUserSegmentsTX(ctx context.Context, arg UpdateUserSegm
 			return txerr
 		}
 
-		txerr = q.DeleteUserSegmentsBySlugs(ctx, DeleteUserSegmentsBySlugsParams{
-			UserID:       arg.UserID,
-			SegmentSlugs: arg.SegmentSlugsRemove,
-		})
-		if txerr != nil {
-			return txerr
-		}
-
-		for _, slug := range arg.SegmentSlugsRemove {
-			// Add records to operations history for removed user segments.
-			txerr = q.CreateOperation(ctx, CreateOperationParams{
-				OpType:      OpRemove,
-				UserID:      arg.UserID,
-				SegmentSlug: slug,
-			})
-			if txerr != nil {
-				return txerr
-			}
-		}
-
 		for _, slug := range arg.SegmentSlugsAdd {
 			txerr := q.AddUserSegmentBySlug(ctx, AddUserSegmentBySlugParams{
 				UserID:   arg.UserID,
@@ -56,6 +36,26 @@ func (store *Store) UpdateUserSegmentsTX(ctx context.Context, arg UpdateUserSegm
 			// Add records to operations history for added user segments.
 			txerr = q.CreateOperation(ctx, CreateOperationParams{
 				OpType:      OpAdd,
+				UserID:      arg.UserID,
+				SegmentSlug: slug,
+			})
+			if txerr != nil {
+				return txerr
+			}
+		}
+
+		txerr = q.DeleteUserSegmentsBySlugs(ctx, DeleteUserSegmentsBySlugsParams{
+			UserID:       arg.UserID,
+			SegmentSlugs: arg.SegmentSlugsRemove,
+		})
+		if txerr != nil {
+			return txerr
+		}
+
+		for _, slug := range arg.SegmentSlugsRemove {
+			// Add records to operations history for removed user segments.
+			txerr = q.CreateOperation(ctx, CreateOperationParams{
+				OpType:      OpRemove,
 				UserID:      arg.UserID,
 				SegmentSlug: slug,
 			})
@@ -131,7 +131,7 @@ func checkExpiredAndUpdate(ctx context.Context, q *Queries) error {
 
 	// Add records to operations history for expired user segments.
 	for _, expiredUserSegment := range expiredUserSegments {
-		err = q.CreateOperation(ctx, CreateOperationParams{
+		err = q.CreateOperationWithTS(ctx, CreateOperationWithTSParams{
 			OpType:      OpRemove,
 			UserID:      expiredUserSegment.UserID,
 			SegmentSlug: expiredUserSegment.Slug,
