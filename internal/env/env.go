@@ -16,12 +16,11 @@ type (
 		Name     string `koanf:"name"`
 		User     string `koanf:"user"`
 		Password string `koanf:"password"`
-		Addr     string `koanf:"addr"`
+		Host     string `koanf:"host"`
 		Port     string `koanf:"port"`
 	}
 
 	AppEnv struct {
-		Addr    string `koanf:"addr"`
 		Port    string `koanf:"port"`
 		Timeout int    `koanf:"timeout"`
 	}
