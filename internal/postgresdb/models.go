@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.20.0
 
-package db
+package postgresdb
 
 import (
 	"database/sql/driver"
@@ -63,9 +63,9 @@ type Operation struct {
 
 type Segment struct {
 	ID int32 `json:"id"`
-	// segment unique name
+	// Segment unique name.
 	Slug string `json:"slug"`
-	// probability of user to be added automatically to the segment, [0..1]
+	// Probability of user to be added automatically to the segment, [0..1].
 	AutoProb float32 `json:"auto_prob"`
 }
 

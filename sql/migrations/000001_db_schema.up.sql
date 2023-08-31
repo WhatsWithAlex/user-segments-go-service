@@ -32,8 +32,8 @@ CREATE UNIQUE INDEX ON "user_segments" ("user_id", "segment_id");
 
 CREATE INDEX ON "operations" ("user_id", "done_at");
 
-COMMENT ON COLUMN "segments"."slug" IS 'segment unique name';
+COMMENT ON COLUMN "segments"."slug" IS 'Segment unique name.';
 
-COMMENT ON COLUMN "segments"."auto_prob" IS 'probability of user to be added automatically to the segment, [0..1]';
+COMMENT ON COLUMN "segments"."auto_prob" IS 'Probability of user to be added automatically to the segment, [0..1].';
 
 ALTER TABLE "user_segments" ADD FOREIGN KEY ("segment_id") REFERENCES "segments" ("id") ON DELETE CASCADE;

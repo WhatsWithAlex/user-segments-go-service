@@ -3,19 +3,17 @@
 //   sqlc v1.20.0
 // source: segments.sql
 
-package db
+package postgresdb
 
 import (
 	"context"
 )
 
 const createSegment = `-- name: CreateSegment :one
-INSERT INTO segments (
-    slug,
-    auto_prob
-) VALUES (
-    $1, $2
-) RETURNING id
+INSERT INTO
+    segments (slug, auto_prob)
+VALUES
+    ($1, $2) RETURNING id
 `
 
 type CreateSegmentParams struct {
@@ -31,8 +29,10 @@ func (q *Queries) CreateSegment(ctx context.Context, arg CreateSegmentParams) (i
 }
 
 const deleteSegment = `-- name: DeleteSegment :exec
-DELETE FROM segments
-WHERE id = $1
+DELETE FROM
+    segments
+WHERE
+    id = $1
 `
 
 func (q *Queries) DeleteSegment(ctx context.Context, id int32) error {
@@ -40,9 +40,60 @@ func (q *Queries) DeleteSegment(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteSegmentBySlug = `-- name: DeleteSegmentBySlug :one
+DELETE FROM
+    segments
+WHERE
+    slug = $1 RETURNING id
+`
+
+func (q *Queries) DeleteSegmentBySlug(ctx context.Context, slug string) (int32, error) {
+	row := q.db.QueryRow(ctx, deleteSegmentBySlug, slug)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const getAutoSegments = `-- name: GetAutoSegments :many
+SELECT
+    id,
+    slug,
+    auto_prob
+FROM
+    segments
+WHERE
+    auto_prob > 0.0
+`
+
+func (q *Queries) GetAutoSegments(ctx context.Context) ([]Segment, error) {
+	rows, err := q.db.Query(ctx, getAutoSegments)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Segment{}
+	for rows.Next() {
+		var i Segment
+		if err := rows.Scan(&i.ID, &i.Slug, &i.AutoProb); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSegmentByID = `-- name: GetSegmentByID :one
-SELECT id, slug, auto_prob FROM segments
-WHERE id = $1
+SELECT
+    id,
+    slug,
+    auto_prob
+FROM
+    segments
+WHERE
+    id = $1
 `
 
 func (q *Queries) GetSegmentByID(ctx context.Context, id int32) (Segment, error) {
@@ -53,8 +104,14 @@ func (q *Queries) GetSegmentByID(ctx context.Context, id int32) (Segment, error)
 }
 
 const getSegmentBySlug = `-- name: GetSegmentBySlug :one
-SELECT id, slug, auto_prob FROM segments
-WHERE slug = $1
+SELECT
+    id,
+    slug,
+    auto_prob
+FROM
+    segments
+WHERE
+    slug = $1
 `
 
 func (q *Queries) GetSegmentBySlug(ctx context.Context, slug string) (Segment, error) {
@@ -65,9 +122,12 @@ func (q *Queries) GetSegmentBySlug(ctx context.Context, slug string) (Segment, e
 }
 
 const updateSegment = `-- name: UpdateSegment :exec
-UPDATE segments
-SET auto_prob = $2
-WHERE id = $1
+UPDATE
+    segments
+SET
+    auto_prob = $2
+WHERE
+    id = $1
 `
 
 type UpdateSegmentParams struct {
