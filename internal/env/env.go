@@ -1,4 +1,4 @@
-package app
+package env
 
 import (
 	"os"
@@ -13,15 +13,17 @@ import (
 
 type (
 	DBEnv struct {
-		DBName     string `koanf:"name"`
-		DBUser     string `koanf:"user"`
-		DBPassword string `koanf:"password"`
-		DBAddr     string `koanf:"addr"`
-		DBPort     string `koanf:"port"`
+		Name     string `koanf:"name"`
+		User     string `koanf:"user"`
+		Password string `koanf:"password"`
+		Addr     string `koanf:"addr"`
+		Port     string `koanf:"port"`
 	}
 
 	AppEnv struct {
-		AppPort string `koanf:"port"`
+		Addr    string `koanf:"addr"`
+		Port    string `koanf:"port"`
+		Timeout int    `koanf:"timeout"`
 	}
 
 	Env struct {
@@ -32,7 +34,7 @@ type (
 )
 
 const (
-	delim  = "\\"
+	delim  = "."
 	prefix = "ENV_"
 )
 
@@ -40,20 +42,19 @@ var k = koanfext.New(delim)
 
 func LoadEnv() (env Env, err error) {
 	tranformation_callback := func(s string) string {
-		return strings.Replace(strings.ToLower(
-			strings.TrimPrefix(s, prefix)), "_", delim, -1)
+		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, prefix)), "_", delim, -1)
 	}
 
 	err = k.Load(kFile.Provider(".env"), dotenv.ParserEnv("", delim, tranformation_callback))
 	if err != nil {
 		if os.IsNotExist(err) {
-			log.Info().Msg("app: .env file not found")
+			log.Info().Msg("env: .env file not found")
 		} else {
 			return
 		}
 	}
 
-	log.Info().Msg("app: loading environment variables")
+	log.Info().Msg("env: loading environment variables")
 	err = k.Load(kEnv.Provider(prefix, delim, tranformation_callback), nil)
 	if err != nil {
 		return
