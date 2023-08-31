@@ -25,3 +25,4 @@ go.work
 
 # web/static generated files
 web/static/*
+!web/static/example.csv
