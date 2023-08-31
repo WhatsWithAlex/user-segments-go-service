@@ -32,29 +32,17 @@ func (osr *operationService) GetUserOperations(ctx context.Context, userID int, 
 	if err != nil {
 		return
 	}
+	if len(operations) == 0 {
+		err = errors.New("no operations for given user")
+		return
+	}
 
 	fileName, err = buildFileName(userID, fromTS, toTS)
 	if err != nil {
 		return
 	}
 
-	file, err := os.Create("./web/static/" + fileName)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	err = writer.Write([]string{"N", "Operation", "Segment", "Time"})
-	if err != nil {
-		return
-	}
-	for n, operation := range operations {
-		err = writer.Write([]string{strconv.FormatInt(int64(n), 10), string(operation.OpType), operation.DoneAt.String()})
-		return
-	}
+	err = writeOperationsToCSV(fileName, operations)
 	return
 }
 
@@ -74,4 +62,32 @@ func buildFileName(userID int, fromTS sql.NullTime, toTS sql.NullTime) (fileName
 
 	fileName = userIDStr + "_" + fromTSStr + "_" + toTSStr + ".csv"
 	return
+}
+
+func writeOperationsToCSV(fileName string, operations []domain.Operation) error {
+	file, err := os.Create("./web/static/" + fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	err = writer.Write([]string{"N", "Operation", "Segment", "Time"})
+	if err != nil {
+		return err
+	}
+	for n, operation := range operations {
+		err = writer.Write([]string{
+			strconv.FormatInt(int64(n), 10),
+			string(operation.OpType),
+			operation.SegmentSlug,
+			operation.DoneAt.String(),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
