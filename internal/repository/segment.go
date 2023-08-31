@@ -8,10 +8,10 @@ import (
 )
 
 type segmentRepository struct {
-	database postgresdb.Store
+	database *postgresdb.Store
 }
 
-func NewSegmentRepository(db postgresdb.Store) domain.SegmentRepository {
+func NewSegmentRepository(db *postgresdb.Store) domain.SegmentRepository {
 	return &segmentRepository{
 		database: db,
 	}

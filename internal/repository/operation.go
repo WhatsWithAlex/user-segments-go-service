@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/WhatsWithAlex/user-segments-go-service/internal/domain"
 	"github.com/WhatsWithAlex/user-segments-go-service/internal/postgresdb"
@@ -10,10 +11,10 @@ import (
 )
 
 type operationRepository struct {
-	database postgresdb.Store
+	database *postgresdb.Store
 }
 
-func NewOperationRepository(db postgresdb.Store) domain.OperationRepository {
+func NewOperationRepository(db *postgresdb.Store) domain.OperationRepository {
 	return &operationRepository{
 		database: db,
 	}
@@ -21,11 +22,11 @@ func NewOperationRepository(db postgresdb.Store) domain.OperationRepository {
 
 func (or *operationRepository) CreateOperation(ctx context.Context, userID int, opType domain.Op, segmentSlug string, doneAt sql.NullTime) error {
 	var doneAtPg *pgtype.Timestamptz
-	err := doneAtPg.Scan(doneAt.Time)
-	if err != nil {
-		return err
+
+	if doneAt.Valid && doneAtPg.Scan(doneAt.Time) != nil {
+		return errors.New("doneAt scan error")
 	}
-	return or.database.CreateOperation(ctx, postgresdb.CreateOperationParams{
+	return or.database.CreateOperationWithTS(ctx, postgresdb.CreateOperationWithTSParams{
 		UserID:      int32(userID),
 		OpType:      postgresdb.Op(opType),
 		SegmentSlug: segmentSlug,
@@ -34,20 +35,20 @@ func (or *operationRepository) CreateOperation(ctx context.Context, userID int, 
 }
 
 func (or *operationRepository) GetUserOperations(ctx context.Context, userID int, fromTS sql.NullTime, toTS sql.NullTime) (operations []domain.Operation, err error) {
-	var fromTSPg, toTSPg *pgtype.Timestamptz
-	err = fromTSPg.Scan(fromTS.Time)
-	if err != nil {
+	var fromTSPg, toTSPg pgtype.Timestamptz
+	if fromTS.Valid && fromTSPg.Scan(fromTS.Time) != nil {
+		err = errors.New("fromTS scan error")
 		return
 	}
-	err = toTSPg.Scan(toTS.Time)
-	if err != nil {
+	if toTS.Valid && toTSPg.Scan(toTS.Time) != nil {
+		err = errors.New("toTS scan error")
 		return
 	}
 
 	operationsPg, err := or.database.GetOperationsByUserID(ctx, postgresdb.GetOperationsByUserIDParams{
 		UserID: int32(userID),
-		FromTS: *fromTSPg,
-		ToTS:   *toTSPg,
+		FromTS: fromTSPg,
+		ToTS:   toTSPg,
 	})
 	if err != nil {
 		return
