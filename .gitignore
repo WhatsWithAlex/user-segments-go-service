@@ -22,3 +22,6 @@ go.work
 
 # Vscode config
 .vscode
+
+# web/static generated files
+web/static/*
