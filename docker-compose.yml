@@ -20,6 +20,7 @@ services:
 
   app:
     container_name: app
+    image: app:latest
     build: .
     env_file:
       - .env
