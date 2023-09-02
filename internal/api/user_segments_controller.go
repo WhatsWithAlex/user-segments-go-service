@@ -14,6 +14,18 @@ type userSegmentController struct {
 	env                *env.Env
 }
 
+// getUserSegments godoc
+//
+//	@Summary		Get user's segments
+//	@Description	get active user's segments
+//	@Tags			user_segments
+//	@Param			user_id	query	int	true	"user's identificator"
+//	@Produce		json
+//	@Success		200	{object}	domain.GetUserSegmentsResponse
+//	@Failure		400	{object}	domain.CommonResponse
+//	@Failure		404	{object}	domain.CommonResponse
+//	@Failure		500	{object}	domain.CommonResponse
+//	@Router			/user_segments/ [get]
 func (usc *userSegmentController) getUserSegments(c *gin.Context) {
 	var request domain.GetUserSegmentsRequest
 
@@ -34,6 +46,21 @@ func (usc *userSegmentController) getUserSegments(c *gin.Context) {
 	})
 }
 
+// updateUserSegments godoc
+//
+//	@Summary		Update user's segments
+//	@Description	add and remove user to/from specified segments
+//	@Tags			user_segments
+//	@Accept			json
+//	@Param			user_id			body	int			true	"user's identificator"
+//	@Param			add_segments	body	[]string	false	"segments to add"
+//	@Param			remove_segments	body	[]string	false	"segments to remove"
+//	@Param			remove_at		body	string		false	"user will automatically removed from assigned segments at this date" Format(date-time)
+//	@Produce		json
+//	@Success		200	{object}	domain.CommonResponse
+//	@Failure		400	{object}	domain.CommonResponse
+//	@Failure		500	{object}	domain.CommonResponse
+//	@Router			/user_segments/ [post]
 func (usc *userSegmentController) updateUserSegments(c *gin.Context) {
 	var request domain.UpdateUserSegmentsRequest
 

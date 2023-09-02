@@ -43,9 +43,11 @@ $ make compose-up
 
 [Описание методов API в Postman](https://documenter.getpostman.com/view/20022244/2s9Y5crzEk)
 
+Swagger документация: `/swagger/index.html`
+
 
 ## TODO:
 
-- [ ] Swagger
+- [X] Swagger
 - [ ] Покрытие тестами
 - [ ] Обработка ошибок

@@ -35,4 +35,7 @@ sqlc:
 		DB_NAME=$(DB_NAME) \
 		sqlc -f sql/sqlc.yaml vet && sqlc -f sql/sqlc.yaml generate
 
+swag:
+	swag init -g internal/app/app.go --parseInternal --parseDependency
+
 .PHONY: postgres createdb dropdb migrateup migratedown sqlc

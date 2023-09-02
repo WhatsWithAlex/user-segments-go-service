@@ -15,6 +15,20 @@ type operationController struct {
 	env              *env.Env
 }
 
+// getOperations godoc
+//
+//	@Summary		Get operations file link
+//	@Description	get csv-file link for operations made in specified period with given user's segments
+//	@Tags			operations
+//	@Produce		json
+//	@Param			user_id	query		integer	true	"user's identificator"
+//	@Param			year	query		integer	true	"year of the starting date"		minimum(1970)	maximum(9999)
+//	@Param			month	query		integer	true	"month of the starting date"	minimum(1)		maximum(12)
+//	@Success		200		{object}	domain.GetOperationsResponse
+//	@Failure		400		{object}	domain.CommonResponse
+//	@Failure		404		{object}	domain.CommonResponse
+//	@Failure		500		{object}	domain.CommonResponse
+//	@Router			/operations/ [get]
 func (oc *operationController) getOperations(c *gin.Context) {
 	var request domain.GetOperationsRequest
 

@@ -9,6 +9,8 @@ import (
 	"github.com/WhatsWithAlex/user-segments-go-service/internal/repository"
 	"github.com/WhatsWithAlex/user-segments-go-service/internal/services"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func newSegmentsRoute(env *env.Env, db *postgresdb.Store, group *gin.RouterGroup) {
@@ -44,6 +46,7 @@ func SetupRouter(env *env.Env, db *postgresdb.Store, ge *gin.Engine) {
 	rootRouter := ge.Group("")
 	rootRouter.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"ok": true}) })
 	rootRouter.Static("/static", "./web/static")
+	rootRouter.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	publicApiRouter := ge.Group("/api")
 	newSegmentsRoute(env, db, publicApiRouter)

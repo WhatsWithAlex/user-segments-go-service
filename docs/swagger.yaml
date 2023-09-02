@@ -1,0 +1,224 @@
+basePath: /api
+definitions:
+  github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  github_com_WhatsWithAlex_user-segments-go-service_internal_domain.GetOperationsResponse:
+    properties:
+      file_url:
+        type: string
+    type: object
+  github_com_WhatsWithAlex_user-segments-go-service_internal_domain.GetUserSegmentsResponse:
+    properties:
+      segments:
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost@8080
+info:
+  contact:
+    email: alexeykorzhin@mail.ru
+    name: Korzhin Alexey
+  title: User's segments management service API
+  version: "1.0"
+paths:
+  /operations/:
+    get:
+      description: get csv-file link for operations made in specified period with
+        given user's segments
+      parameters:
+      - description: user's identificator
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: year of the starting date
+        in: query
+        maximum: 9999
+        minimum: 1970
+        name: year
+        required: true
+        type: integer
+      - description: month of the starting date
+        in: query
+        maximum: 12
+        minimum: 1
+        name: month
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.GetOperationsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+      summary: Get operations file link
+      tags:
+      - operations
+  /segments/:
+    delete:
+      description: delete segment by slug
+      parameters:
+      - description: segment slug
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+      summary: Delete segment
+      tags:
+      - segments
+    post:
+      consumes:
+      - application/json
+      description: create segment with given unique name (slug)
+      parameters:
+      - description: segment name
+        in: body
+        name: slug
+        required: true
+        schema:
+          type: string
+      - description: probability of auto assignment
+        in: body
+        name: probability
+        schema:
+          type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+      summary: Create segment
+      tags:
+      - segments
+  /user_segments/:
+    get:
+      description: get active user's segments
+      parameters:
+      - description: user's identificator
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.GetUserSegmentsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+      summary: Get user's segments
+      tags:
+      - user_segments
+    post:
+      consumes:
+      - application/json
+      description: add and remove user to/from specified segments
+      parameters:
+      - description: user's identificator
+        in: body
+        name: user_id
+        required: true
+        schema:
+          type: integer
+      - description: segments to add
+        in: body
+        name: add_segments
+        schema:
+          items:
+            type: string
+          type: array
+      - description: segments to remove
+        in: body
+        name: remove_segments
+        schema:
+          items:
+            type: string
+          type: array
+      - description: user will automatically removed from assigned segments at this
+          date
+        format: email
+        in: body
+        name: remove_at
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_WhatsWithAlex_user-segments-go-service_internal_domain.CommonResponse'
+      summary: Update user's segments
+      tags:
+      - user_segments
+schemes:
+- http
+swagger: "2.0"

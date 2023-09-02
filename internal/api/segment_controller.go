@@ -13,6 +13,19 @@ type segmentController struct {
 	env            *env.Env
 }
 
+// createSegment godoc
+//
+//	@Summary		Create segment
+//	@Description	create segment with given unique name (slug)
+//	@Tags			segments
+//	@Accept			json
+//	@Param			slug		body	string	true	"segment name"
+//	@Param			probability	body	number	false	"probability of auto assignment"
+//	@Produce		json
+//	@Success		200	{object}	domain.CommonResponse
+//	@Failure		400	{object}	domain.CommonResponse
+//	@Failure		500	{object}	domain.CommonResponse
+//	@Router			/segments/ [post]
 func (sc *segmentController) createSegment(c *gin.Context) {
 	var request domain.CreateSegmentRequest
 
@@ -31,6 +44,18 @@ func (sc *segmentController) createSegment(c *gin.Context) {
 	c.JSON(http.StatusOK, domain.SuccessResponse("segment created successfully"))
 }
 
+// deleteSegment godoc
+//
+//	@Summary		Delete segment
+//	@Description	delete segment by slug
+//	@Tags			segments
+//	@Param			slug	query	string	true	"segment slug"
+//	@Produce		json
+//	@Success		200	{object}	domain.CommonResponse
+//	@Failure		400	{object}	domain.CommonResponse
+//	@Failure		404	{object}	domain.CommonResponse
+//	@Failure		500	{object}	domain.CommonResponse
+//	@Router			/segments/ [delete]
 func (sc *segmentController) deleteSegment(c *gin.Context) {
 	var request domain.DeleteSegmentRequest
 

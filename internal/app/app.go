@@ -9,12 +9,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	_ "github.com/WhatsWithAlex/user-segments-go-service/docs"
 )
 
 var EnvLoadError = errors.New("app: error loading environment variables")
 var DBSetupError = errors.New("app: error setupping database")
 var ServerSetupError = errors.New("app: error setupping server")
 
+//	@title		User's segments management service API
+//	@version	1.0
+
+//	@contact.name	Korzhin Alexey
+//	@contact.email	alexeykorzhin@mail.ru
+//	@host			localhost@8080
+
+// @BasePath	/api
+// @schemes	http
 func Run() (err error) {
 	env, err := env.LoadEnv()
 	if err != nil {
